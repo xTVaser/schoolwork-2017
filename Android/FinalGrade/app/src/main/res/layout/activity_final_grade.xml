@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView android:id="@+id/edit_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="10dp"
+        android:textSize="18dp"
+        android:hint="@string/title"
+        android:textColorHint="@color/textDark" />
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <TextView android:id="@+id/edit_message1"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:textAlignment="textStart"
+            android:gravity="start"
+            android:textSize="18dp"
+            android:layout_marginLeft="10dp"
+            android:hint="@string/textfield1Text"
+            android:textColorHint="@color/textDark"
+            android:layout_weight="1"/>
+
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/assignmentField"
+            android:layout_weight="1.5"/>
+    </LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="75dp">
+        <TextView android:id="@+id/edit_message2"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:textAlignment="textStart"
+            android:textSize="18dp"
+            android:textColorHint="@color/textDark"
+            android:layout_marginLeft="10dp"
+            android:gravity="start"
+            android:hint="@string/textfield2Text"
+            android:layout_weight="1"/>
+
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/examField"
+            android:layout_weight="1.5"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="75dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="24dp"
+            android:textColor="@color/textDark"
+            android:text="@string/grade"
+            android:id="@+id/gradeOutput"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/calculateBtn"
+            android:onClick="calculateGrade"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/clearBtn"
+            android:onClick="clearGrades"/>
+
+    </LinearLayout>
+
+</LinearLayout>

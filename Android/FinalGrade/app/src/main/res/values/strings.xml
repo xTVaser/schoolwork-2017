@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Whats My Final Grade?</string>
+    <string name="title">Enter Your Marks</string>
+
+    <string name="textfield1Text">Assignment (%)</string>
+    <string name="textfield2Text">Exams (%)</string>
+
+    <string name="grade">Please Enter the Above Fields</string>
+
+    <string name="calculateBtn">CALCULATE</string>
+    <string name="clearBtn">CLEAR</string>
+</resources>
