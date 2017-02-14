@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_color_picker"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    tools:context="com.example.tyler.colorpicker.ColorPicker">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="2.5dp"
+            android:text="@string/colourGreen"
+            android:background="@color/colourGreen"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="2.5dp"
+            android:text="@string/colourGold"
+            android:background="@color/colourGold"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="2.5dp"
+            android:text="@string/colourMaroon"
+            android:background="@color/colourMaroon"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/colourPurple"
+            android:background="@color/colourPurple"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/green"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="5dp"
+            android:background="@color/colourGreen"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:text="@string/counterGreen"/>
+        <TextView android:id="@+id/gold"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="5dp"
+            android:background="@color/colourGold"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:text="@string/counterGold"/>
+        <TextView android:id="@+id/maroon"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="5dp"
+            android:background="@color/colourMaroon"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:text="@string/counterMaroon"/>
+        <TextView android:id="@+id/purple"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="5dp"
+            android:background="@color/colourPurple"
+            android:textColor="@color/colorBlack"
+            android:gravity="center"
+            android:text="@string/counterPurple"/>
+
+    </LinearLayout>
+</LinearLayout>

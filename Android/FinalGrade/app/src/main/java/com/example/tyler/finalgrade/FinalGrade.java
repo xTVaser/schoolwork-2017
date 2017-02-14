@@ -33,8 +33,8 @@ public class FinalGrade extends AppCompatActivity {
             return;
         }
 
-        double assignmentGrade = Double.parseDouble(assignments.getText().toString());
-        double examGrade = Double.parseDouble(exams.getText().toString());
+        int assignmentGrade = (int)Double.parseDouble(assignments.getText().toString());
+        int examGrade = (int)Double.parseDouble(exams.getText().toString());
 
         if (assignmentGrade > 100 || assignmentGrade < 0 || examGrade > 100 || examGrade < 0) {
 

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Click Favourite Colours</string>
+    <string name="colourGreen">Green</string>
+    <string name="colourGold">Gold</string>
+    <string name="colourMaroon">Maroon</string>
+    <string name="colourPurple">Purple</string>
+
+    <string name="counterGreen">Green : </string>
+    <string name="counterGold">Gold : </string>
+    <string name="counterMaroon">Maroon : </string>
+    <string name="counterPurple">Purple : </string>
+</resources>

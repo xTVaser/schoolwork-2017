@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Show The Mark</string>
+    <string name="label_name">Student Name</string>
+    <string name="label_id">Student ID</string>
+</resources>
