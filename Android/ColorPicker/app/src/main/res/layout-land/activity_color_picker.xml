@@ -20,27 +20,31 @@
             android:layout_weight="1"
             android:layout_marginRight="2.5dp"
             android:text="@string/colourGreen"
-            android:background="@color/colourGreen"/>
+            android:background="@color/colourGreen"
+            android:onClick="incGreen"/>
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginRight="2.5dp"
             android:text="@string/colourGold"
-            android:background="@color/colourGold"/>
+            android:background="@color/colourGold"
+            android:onClick="incGold"/>
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginRight="2.5dp"
             android:text="@string/colourMaroon"
-            android:background="@color/colourMaroon"/>
+            android:background="@color/colourMaroon"
+            android:onClick="incMaroon"/>
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/colourPurple"
-            android:background="@color/colourPurple"/>
+            android:background="@color/colourPurple"
+            android:onClick="incPurple"/>
     </LinearLayout>
 
     <LinearLayout
