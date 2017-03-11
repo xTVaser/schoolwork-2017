@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.tyler.imagesfragments.ImageFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView android:id="@+id/fragImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:src="@drawable/haskell"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView android:id="@+id/fragTitle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="TITLE"
+        android:gravity="center"/>
+
+    <TextView android:id="@+id/fragDescription"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="100dp"
+        android:gravity="center"
+        android:text="description"/>
+
+</LinearLayout>
