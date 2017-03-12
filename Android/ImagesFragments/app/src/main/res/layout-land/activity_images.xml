@@ -104,13 +104,16 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="2">
+        android:layout_weight="2"
+        android:layout_margin="10dp"
+        android:gravity="center_horizontal">
 
         <fragment
             android:id="@+id/fragmentDisplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:name="com.example.tyler.imagesfragments.ImageFragment">
+            android:name="com.example.tyler.imagesfragments.ImageFragment"
+            tools:layout="@layout/fragment_image">
         </fragment>
     </LinearLayout>
 

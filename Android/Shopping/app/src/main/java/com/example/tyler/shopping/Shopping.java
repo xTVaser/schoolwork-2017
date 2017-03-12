@@ -83,7 +83,7 @@ public class Shopping extends AppCompatActivity {
 
                 }
 
-                total.setText("Total: " + total);
+                total.setText("Total: " + totalCost);
             }
         });
 
@@ -139,7 +139,7 @@ public class Shopping extends AppCompatActivity {
         quantity.setWidth(dpToPixels(200));
         quantity.setGravity(Gravity.CENTER);
         quantity.setHint("0");
-        quantity.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        quantity.setInputType(InputType.TYPE_CLASS_NUMBER);
         quantity.setLayoutParams(gridParams);
 
         bookContainer.addView(book);
