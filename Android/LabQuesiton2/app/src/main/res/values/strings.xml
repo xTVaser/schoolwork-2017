@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Fragment and Shapes</string>
+    <string-array name="Shapes">
+        <item>Circle</item>
+        <item>Line</item>
+        <item>Rectangle</item>
+    </string-array>
+</resources>

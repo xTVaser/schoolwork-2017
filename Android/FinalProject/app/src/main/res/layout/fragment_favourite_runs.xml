@@ -2,8 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp"
-    tools:context="com.example.tyler.finalproject.FavouriteRuns">
+    tools:context="com.example.tyler.finalproject.FavouriteRuns"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_margin="25dp">
 
     <ListView
         android:id="@+id/favouriteList"

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Course Descriptions Static Layout</string>
+    <string-array name="Titles">
+        <item>COSC3117</item>
+        <item>COSC3127</item>
+        <item>COSC3596</item>
+        <item>COSC4106</item>
+    </string-array>
+    <string-array name="Descriptions">
+        <item>This course examines the goals and methods of artificial intelligence. The goals are to understand and to create intelligent software.</item>
+        <item>Comparative study of programming languages. Formal language definition; the Backus-Naur form and syntax graphs. Run-time considerations. Interpretive languages.</item>
+        <item>This course introduces the student to one of the major Mobile Computing platforms, and develops their ability to write software applications for the platform.</item>
+        <item>Design of efficient algorithms. Space and time complexity. Bounds on the performance of algorithms. Problems from such areas as sorting, data structures and arithmetic computations will be discussed. NP completeness.</item>
+    </string-array>
+</resources>
