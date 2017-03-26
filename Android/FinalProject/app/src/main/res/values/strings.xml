@@ -10,4 +10,10 @@
     <string name="searchHint">Game Name...</string>
     <string name="searchButton">Browse</string>
     <string name="notificationText">New runs for Favourited Games</string>
+
+    <!-- Run Page Fragment Strings -->
+    <string name="rank">Rank</string>
+    <string name="runner">Runner</string>
+    <string name="time">Time</string>
+    <string name="date">Date</string>
 </resources>

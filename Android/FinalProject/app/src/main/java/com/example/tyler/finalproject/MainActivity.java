@@ -4,21 +4,38 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import static android.widget.Toast.makeText;
@@ -27,20 +44,21 @@ public class MainActivity extends AppCompatActivity {
 
     // ok6qlo1g will be used for testing
 
-    private String[] test = {"Category 1", "Category 2", "Category 3", "Category 4", "Category 5"};
+    private ArrayList<String> categories = new ArrayList<>();
+    private String gameID;
+
     private DrawerLayout navDrawer;
+    private LinearLayout navDrawerContainer;
     private ListView navDrawerItems;
 
     private ImageButton searchPageBtn;
     private ImageButton favouritePageBtn;
 
     private Fragment currentFragment;
+    private SearchPage searchPageFragment;
 
     private TextView gameName;
     private Button favouriteBtn;
-
-    private ArrayList<String> gameList;
-    private ArrayList<String> gameIDs;
 
 
     @Override
@@ -49,37 +67,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Scanner in = new Scanner(getResources().openRawResource(R.raw.gamelist));
-
-        while(in.hasNext()) {
-
-            String[] line = in.nextLine().split("\t");
-            gameList.add(line[0]);
-            gameIDs.add(line[1]);
-        }
-
-        in.close();
-
         searchPageBtn = (ImageButton) findViewById(R.id.searchPageBtn);
         favouritePageBtn = (ImageButton) findViewById(R.id.favouriteListBtn);
 
         gameName = (TextView) findViewById(R.id.gameName);
         favouriteBtn = (Button) findViewById(R.id.favouriteBtn);
 
+        navDrawer = (DrawerLayout) findViewById(R.id.main_layout);
+        navDrawerContainer = (LinearLayout) findViewById(R.id.left_drawer);
+        navDrawerItems = (ListView) findViewById(R.id.navDrawer);
+
         FragmentManager fragMang = getFragmentManager();
         FragmentTransaction transaction = fragMang.beginTransaction();
         SearchPage searchPage = new SearchPage();
         transaction.add(R.id.fragmentContainer, searchPage);
-        transaction.addToBackStack(null);
+        currentFragment = searchPage; //TODO: get rid of these, replace with three of a kind
+        searchPageFragment = searchPage;
         transaction.commit();
-
-
-        navDrawer = (DrawerLayout) findViewById(R.id.main_layout);
-        navDrawerItems = (ListView) findViewById(R.id.navDrawer);
-
-        navDrawerItems.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, test));
-        navDrawerItems.setOnItemClickListener(new DrawerItemClickListener());
-
     }
 
     public void addGameToFavourites(View view) {
@@ -93,25 +97,81 @@ public class MainActivity extends AppCompatActivity {
 
     public void browseGame(View view) {
 
-        Toast.makeText(this, "does this work?", Toast.LENGTH_SHORT).show();
+        String userInput = ((SearchPage)currentFragment).searchField.getText().toString();
+        int currentPosition = ((SearchPage)currentFragment).selectedPosition;
+        String actualGame = ((SearchPage)currentFragment).gameList.get(currentPosition);
+        gameID = ((SearchPage)currentFragment).gameIDs.get(currentPosition);
+
+        //Toast.makeText(this, actualGame + " " + actualID, Toast.LENGTH_SHORT).show();
+
+        if (!actualGame.equals(userInput)) { //could try to do the fuzzy search here TODO: maybe
+
+            Toast.makeText(this, "Error, untracked game", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //Update the drawer information TODO: make the drawer stuff look nicer, config the layout
+        gameName.setText(userInput);
+        String jsonURL = "http://www.speedrun.com/api/v1/games/" + gameID + "/categories";
+
+        // TODO: might switch to using volley
+        try {
+            JSONObject json = new JSONParser(this).execute(jsonURL).get();
+            JSONArray categoryData = json.getJSONArray("data");
+
+            if (categoryData.length() < 1) {
+                Toast.makeText(this, "Game has no runs associated with it.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            categories = new ArrayList<>();
+            for (int i = 0; i < categoryData.length(); i++) {
+
+                JSONObject category = categoryData.getJSONObject(i);
+                String test = category.getString("name");
+                categories.add(test);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        navDrawerItems.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, categories));
+        navDrawerItems.setOnItemClickListener(new DrawerItemClickListener());
+
+        launchBrowseTab(0);
+    }
+
+    private void launchBrowseTab(int categoryPos) {
+
+        //Hide search button and display progress bar
+        searchPageFragment.searchBtn.setVisibility(View.GONE);
+        searchPageFragment.progressBar.setVisibility(View.VISIBLE);
+
+        //Open the run
+        FragmentManager fragMang = getFragmentManager();
+        Bundle args = new Bundle();
+        args.putString("gameID", gameID);
+        args.putInt("categoryPos", categoryPos);
+        args.putString("title", categories.get(categoryPos));
+        FragmentTransaction transaction = fragMang.beginTransaction();
+        BrowseRuns browseRuns = new BrowseRuns();
+        browseRuns.setArguments(args);
+        browseRuns.passFragment(searchPageFragment);
+        transaction.replace(R.id.fragmentContainer, browseRuns);
+        currentFragment = browseRuns;
+        transaction.commit();
+
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
+            launchBrowseTab(position);
+            navDrawer.closeDrawer(navDrawerContainer);
         }
     }
 
-    private void selectItem(int position) {
-
-        // the navigation android example has a good example of adding a fragment dynamically here
-        makeText(this, "Test", Toast.LENGTH_LONG).show();
-    }
-
-
-
-
+    // TODO: fix backstack issues, make it clear out the backstack every now and then
     public void loadSearchPage(View view) {
 
         FragmentManager fragMang = getFragmentManager();
@@ -119,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
         SearchPage searchPage = new SearchPage();
         transaction.replace(R.id.fragmentContainer, searchPage);
         transaction.addToBackStack(null);
+        currentFragment = searchPage;
+        searchPageFragment = searchPage;
         transaction.commit();
     }
 
@@ -129,12 +191,9 @@ public class MainActivity extends AppCompatActivity {
         FavouriteRuns favRuns = new FavouriteRuns();
         transaction.replace(R.id.fragmentContainer, favRuns);
         transaction.addToBackStack(null);
+        currentFragment = favRuns;
         transaction.commit();
     }
-
-
-
-
 }
 
 
