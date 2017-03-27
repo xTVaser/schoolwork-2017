@@ -1,12 +1,19 @@
 package com.example.tyler.finalproject;
 
+import android.app.AlarmManager;
+import android.app.Application;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> categories = new ArrayList<>();
     private String gameID;
+    private String currentGameName;
 
     private DrawerLayout navDrawer;
     private LinearLayout navDrawerContainer;
@@ -45,13 +53,16 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton searchPageBtn;
     private ImageButton favouritePageBtn;
 
-    private Fragment currentFragment;
     private SearchPage searchPageFragment;
+    private BrowseRuns browsePageFragment;
+    private FavouriteGames favouritePageFragment;
 
     private TextView gameName;
     private Button favouriteBtn;
     private String gamePicURL;
 
+    private boolean categorySelected = false;
+    private int categoryPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        enableNotifications(getApplication());
+
         searchPageBtn = (ImageButton) findViewById(R.id.searchPageBtn);
+        searchPageBtn.setImageResource(R.drawable.search_active);
         favouritePageBtn = (ImageButton) findViewById(R.id.favouriteListBtn);
 
         gameName = (TextView) findViewById(R.id.gameName);
@@ -69,13 +83,51 @@ public class MainActivity extends AppCompatActivity {
         navDrawerContainer = (LinearLayout) findViewById(R.id.left_drawer);
         navDrawerItems = (ListView) findViewById(R.id.navDrawer);
 
+        navDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+                if (categorySelected) {
+                    categorySelected = false;
+                    searchPageBtn.setImageResource(R.drawable.search);
+                    favouritePageBtn.setImageResource(R.drawable.star);
+                    launchBrowseTab(categoryPosition);
+                    categoryPosition = 0;
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
         FragmentManager fragMang = getFragmentManager();
         FragmentTransaction transaction = fragMang.beginTransaction();
         SearchPage searchPage = new SearchPage();
         transaction.add(R.id.fragmentContainer, searchPage);
-        currentFragment = searchPage; //TODO: get rid of these, replace with three of a kind
         searchPageFragment = searchPage;
         transaction.commit();
+    }
+
+    public void enableNotifications(Application context) {
+
+        Intent intent = new Intent(context, NotificationService.class);
+        PendingIntent pending_intent = PendingIntent.getService(context, 0, intent, 0);
+
+        AlarmManager alarm_mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarm_mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(), 1000, pending_intent);
     }
 
     public void addGameToFavourites(View view) {
@@ -103,23 +155,49 @@ public class MainActivity extends AppCompatActivity {
         insert.put("name", gameName.getText().toString());
         insert.put("picurl", gamePicURL);
         db.insert("favourites", null, insert);
+        db.close();
 
         favouriteBtn.setVisibility(View.GONE);
     }
 
     public void browseGame(View view) {
 
-        String userInput = ((SearchPage)currentFragment).searchField.getText().toString();
-        int currentPosition = ((SearchPage)currentFragment).selectedPosition;
-        String actualGame = ((SearchPage)currentFragment).gameList.get(currentPosition);
-        gameID = ((SearchPage)currentFragment).gameIDs.get(currentPosition);
+        String userInput = searchPageFragment.searchField.getText().toString();
 
-        if (!actualGame.equals(userInput)) { //could try to do the fuzzy search here TODO: maybe
-
-            Toast.makeText(this, "Error, untracked game", Toast.LENGTH_SHORT).show();
+        if (userInput.equals(""))
             return;
+
+        int currentPosition = searchPageFragment.selectedPosition;
+        String actualGame = searchPageFragment.gameList.get(currentPosition);
+        gameID = searchPageFragment.gameIDs.get(currentPosition);
+
+        if (!actualGame.equals(userInput)) {
+
+            try {
+
+                String jsonUrl = "http://www.speedrun.com/api/v1/games?name=" + userInput.trim();
+                JSONArray fuzzySearch = new JSONParser(this).execute(jsonUrl).get().getJSONArray("data");
+
+                if (fuzzySearch.length() <= 0) { //Still no results
+                    Toast.makeText(this, "Error, untracked game", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Grab the first matching result
+                JSONObject fuzzyResults = fuzzySearch.getJSONObject(0);
+
+                gameID = fuzzyResults.getString("id");
+                actualGame = fuzzyResults.getJSONObject("names").getString("international");
+            }
+            catch (InterruptedException | ExecutionException | JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "JSON Error on Fuzzy Search", Toast.LENGTH_SHORT).show();
+            }
         }
 
+        searchPageBtn.setImageResource(R.drawable.search);
+        favouritePageBtn.setImageResource(R.drawable.star);
+        //All it needs is the ID and the name (to avoid another API call)
         updateDrawerAndDisplay(gameID, actualGame);
     }
 
@@ -137,8 +215,9 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(e.getMessage());
         }
 
-        //Update the drawer information TODO: make the drawer stuff look nicer, config the layout
+        //Update the drawer information
         gameName.setText(actualGame);
+        currentGameName = actualGame;
         jsonURL = "http://www.speedrun.com/api/v1/games/" + gameID + "/categories";
 
         try {
@@ -172,31 +251,49 @@ public class MainActivity extends AppCompatActivity {
             favouriteBtn.setVisibility(View.GONE);
         else
             favouriteBtn.setVisibility(View.VISIBLE);
+        db.close();
 
         //Close the soft keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        // TODO: changing this to be a param would allow for the notification intents to go directly to the right category
         launchBrowseTab(0);
     }
 
     private void launchBrowseTab(int categoryPos) {
 
         //Hide search button and display progress bar
-        searchPageFragment.searchBtn.setVisibility(GONE);
-        searchPageFragment.progressBar.setVisibility(View.VISIBLE);
+        if (searchPageFragment != null) {
+            searchPageFragment.searchBtn.setVisibility(View.GONE);
+            searchPageFragment.progressBar.setVisibility(View.VISIBLE);
+        }
+
+        //Hide favourite page stuff
+        if (favouritePageFragment != null) {
+            favouritePageFragment.favouriteList.setVisibility(View.GONE);
+            favouritePageFragment.progressBar.setVisibility(View.VISIBLE);
+        }
+
+        //Hide run page stuff
+        if (browsePageFragment != null) {
+            browsePageFragment.runList.setVisibility(View.GONE);
+            browsePageFragment.progressBar.setVisibility(View.VISIBLE);
+        }
 
         //Open the run
         FragmentManager fragMang = getFragmentManager();
         Bundle args = new Bundle();
+        args.putString("gameName", currentGameName);
         args.putString("gameID", gameID);
         args.putInt("categoryPos", categoryPos);
         args.putString("title", categories.get(categoryPos));
         FragmentTransaction transaction = fragMang.beginTransaction();
         BrowseRuns browseRuns = new BrowseRuns();
         browseRuns.setArguments(args);
-        browseRuns.passFragment(searchPageFragment);
+        Fragment[] fragments = {searchPageFragment, favouritePageFragment};
+        browseRuns.passFragments(fragments);
         transaction.replace(R.id.fragmentContainer, browseRuns);
-        currentFragment = browseRuns;
+        browsePageFragment = browseRuns;
         transaction.commit();
 
     }
@@ -204,33 +301,36 @@ public class MainActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            launchBrowseTab(position);
+
+            categorySelected = true;
+            categoryPosition = position;
             navDrawer.closeDrawer(navDrawerContainer);
-            // TODO: make a loading bar for this as well
         }
     }
 
-    // TODO: fix backstack issues, make it clear out the backstack every now and then
     public void loadSearchPage(View view) {
+
+        searchPageBtn.setImageResource(R.drawable.search_active);
+        favouritePageBtn.setImageResource(R.drawable.star);
 
         FragmentManager fragMang = getFragmentManager();
         FragmentTransaction transaction = fragMang.beginTransaction();
         SearchPage searchPage = new SearchPage();
         transaction.replace(R.id.fragmentContainer, searchPage);
-        transaction.addToBackStack(null);
-        currentFragment = searchPage;
         searchPageFragment = searchPage;
         transaction.commit();
     }
 
     public void loadFavouritePage(View view) {
 
+        searchPageBtn.setImageResource(R.drawable.search);
+        favouritePageBtn.setImageResource(R.drawable.star_active);
+
         FragmentManager fragMang = getFragmentManager();
         FragmentTransaction transaction = fragMang.beginTransaction();
         FavouriteGames favRuns = new FavouriteGames();
         transaction.replace(R.id.fragmentContainer, favRuns);
-        transaction.addToBackStack(null);
-        currentFragment = favRuns;
+        favouritePageFragment = favRuns;
         transaction.commit();
     }
 }

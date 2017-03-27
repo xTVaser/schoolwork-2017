@@ -8,8 +8,14 @@
     android:gravity="center"
     android:layout_margin="25dp">
 
+    <ProgressBar android:id="@+id/progressBarFavourites"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="gone"
+        android:max="100"/>
     <ListView
         android:id="@+id/favouriteList"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:dividerHeight="2dp">

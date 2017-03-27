@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Speedrun Viewer</string>
+
+    <!-- Drawer Strings -->
+    <string name="addToFavourites">Ajouter aux Favoris</string>
+    <string name="gameNamePrompt">Rechercher un Jeu</string>
+    <string name="categoryHeader">Catégories</string>
+
+    <!-- Search Page Fragment Strings -->
+    <string name="searchPrompt">Entrez le Jeu Ci-dessous</string>
+    <string name="searchHint">Nom du Jeu...</string>
+    <string name="searchButton">Feuilleter</string>
+    <string name="notificationText">Nouvelles courses pour les jeux favoris:</string>
+
+    <!-- Run Page Fragment Strings -->
+    <string name="rank">Rang</string>
+    <string name="runner">Joueur</string>
+    <string name="time">Temps</string>
+    <string name="date">Date</string>
+</resources>

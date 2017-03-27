@@ -27,17 +27,21 @@ public class GetRuns implements Runnable {
     private int categoryPos;
     private String gameID;
 
-    private Fragment currentFragment;
+    private SearchPage searchPageFragment;
+    private FavouriteGames favouritePageFragment;
+    private BrowseRuns browsePageFragment;
 
 
-    public GetRuns(Activity activity, int categoryPos, String gameID, Fragment currentFragment) {
+    public GetRuns(Activity activity, int categoryPos, String gameID, SearchPage searchPageFragment,
+                   BrowseRuns browsePageFragment, FavouriteGames favouritePageFragment) {
 
         this.activity = activity;
         this.categoryPos = categoryPos;
         this.gameID = gameID;
 
-        this.currentFragment = currentFragment;
-
+        this.searchPageFragment = searchPageFragment;
+        this.browsePageFragment = browsePageFragment;
+        this.favouritePageFragment = favouritePageFragment;
     }
 
     @Override
@@ -93,8 +97,21 @@ public class GetRuns implements Runnable {
                 runs.add(newRun);
             }
 
-            ((SearchPage)currentFragment).searchBtn.setVisibility(View.VISIBLE);
-            ((SearchPage)currentFragment).progressBar.setVisibility(View.GONE);
+            if (searchPageFragment != null) {
+                searchPageFragment.searchBtn.setVisibility(View.VISIBLE);
+                searchPageFragment.progressBar.setVisibility(View.GONE);
+            }
+
+            if (browsePageFragment != null) {
+                browsePageFragment.runList.setVisibility(View.VISIBLE);
+                browsePageFragment.progressBar.setVisibility(View.GONE);
+            }
+
+            if (favouritePageFragment != null) {
+                favouritePageFragment.favouriteList.setVisibility(View.VISIBLE);
+                favouritePageFragment.progressBar.setVisibility(View.GONE);
+            }
+
 
         }
         catch (Exception e) {

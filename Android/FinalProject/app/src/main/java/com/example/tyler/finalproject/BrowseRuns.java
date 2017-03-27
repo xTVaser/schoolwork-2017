@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -25,37 +26,45 @@ import java.util.List;
 public class BrowseRuns extends Fragment {
 
     private String gameID;
+    private String gameName;
     private int categoryPos;
 
-    private ListView runList;
+    protected ListView runList;
 
-    private Fragment currentFragment;
+    private SearchPage searchPageFragment;
+    private BrowseRuns browsePageFragment = this;
+    private FavouriteGames favouritePageFragment;
+
+    protected ProgressBar progressBar;
 
     public BrowseRuns() {
     }
 
-    public void passFragment(Fragment currentFragment) {
+    public void passFragments(Fragment[] fragments) {
 
-        this.currentFragment = currentFragment;
+        searchPageFragment = (SearchPage) fragments[0];
+        favouritePageFragment = (FavouriteGames) fragments[1];
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        gameName = getArguments().getString("gameName");
         gameID = getArguments().getString("gameID");
         categoryPos = getArguments().getInt("categoryPos");
-        getActivity().setTitle(getArguments().getString("title"));
+        getActivity().setTitle(gameName + " - " + getArguments().getString("title"));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_run_list, container, false);
 
-        GetRuns getRuns = new GetRuns(getActivity(), categoryPos, gameID, currentFragment);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarRuns);
+
+        GetRuns getRuns = new GetRuns(getActivity(), categoryPos, gameID, searchPageFragment, browsePageFragment, favouritePageFragment);
         Thread t = new Thread(getRuns);
         t.start();
-
 
         //Get the Runs
         List<Run> runs = new ArrayList<>();
@@ -86,7 +95,6 @@ public class BrowseRuns extends Fragment {
         return rootView;
     }
 
-    //TODO: check pagination for categories
     private JSONObject hasNextPage(JSONObject paginationData) throws Exception {
 
         if (paginationData == null)

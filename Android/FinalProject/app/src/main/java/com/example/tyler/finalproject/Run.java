@@ -10,7 +10,6 @@ public class Run {
     protected Date submittedDate;
 
     protected String runLink;
-    // TODO: finish class
 
     public Run(int rank, String name, long seconds, Date submittedDate, String runLink) {
 

@@ -11,20 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
-
 
 public class FavouriteGames extends Fragment {
 
     ArrayList<String> gameIDs = new ArrayList<>();
     ArrayList<String> gameNames = new ArrayList<>();
 
-    ListView favouriteList;
+    protected ListView favouriteList;
+    protected ProgressBar progressBar;
 
     public FavouriteGames() {
     }
@@ -40,6 +40,7 @@ public class FavouriteGames extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_favourite_games, container, false);
 
         favouriteList = (ListView) rootView.findViewById(R.id.favouriteList);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarFavourites);
 
         SQLiteDatabase db = getActivity().openOrCreateDatabase("srvFavourites", MODE_PRIVATE, null);
         Cursor cursor = db.rawQuery("SELECT * FROM favourites", null);
@@ -55,6 +56,7 @@ public class FavouriteGames extends Fragment {
                 gameNames.add(cursor.getString(cursor.getColumnIndexOrThrow("name")));
             } while (cursor.moveToNext());
         }
+        db.close();
 
         favouriteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -93,6 +95,7 @@ public class FavouriteGames extends Fragment {
         Cursor cursor = db.rawQuery("SELECT * FROM favourites", null);
         cursor.moveToFirst();
         FavouriteAdapter adapter = new FavouriteAdapter(getActivity(), cursor);
+        db.close();
         favouriteList.setAdapter(adapter);
     }
 
