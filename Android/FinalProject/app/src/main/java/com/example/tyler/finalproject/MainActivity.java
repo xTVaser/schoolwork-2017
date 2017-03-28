@@ -85,14 +85,10 @@ public class MainActivity extends AppCompatActivity {
 
         navDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-
-            }
+            public void onDrawerSlide(View drawerView, float slideOffset) {}
 
             @Override
-            public void onDrawerOpened(View drawerView) {
-
-            }
+            public void onDrawerOpened(View drawerView) {}
 
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -107,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
+            public void onDrawerStateChanged(int newState) {}
         });
 
         FragmentManager fragMang = getFragmentManager();
@@ -148,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
                    "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
                    "id TEXT NOT NULL, "+
                    "name TEXT NOT NULL, "+
-                   "picurl TEXT NOT NULL)");
+                   "picurl TEXT NOT NULL," +
+                   "last_notified_runid TEXT)");
 
         ContentValues insert = new ContentValues();
         insert.put("id", gameID);
@@ -203,6 +198,10 @@ public class MainActivity extends AppCompatActivity {
 
     protected void updateDrawerAndDisplay(String gameID, String actualGame) {
 
+        // hack
+        this.gameID = gameID;
+        this.currentGameName = actualGame;
+
         String jsonURL = "http://www.speedrun.com/api/v1/games/" + gameID;
         try {
 
@@ -245,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
         SQLiteDatabase db = openOrCreateDatabase("srvFavourites", MODE_PRIVATE, null);
         Cursor cursor = db.rawQuery("SELECT * FROM favourites WHERE id = '" + gameID + "'", null);
+        cursor.moveToFirst();
 
         //If we have already favourited it, dont favourite it again
         if (cursor.getCount() > 0)
@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
         //Close the soft keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
         // TODO: changing this to be a param would allow for the notification intents to go directly to the right category
         launchBrowseTab(0);
     }

@@ -81,7 +81,13 @@ public class FavouriteGames extends Fragment {
 
     private void openBrowsePage(int position) {
 
-        ((MainActivity)getActivity()).updateDrawerAndDisplay(gameIDs.get(position), gameNames.get(position));
+        SQLiteDatabase db = getActivity().openOrCreateDatabase("srvFavourites", MODE_PRIVATE, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM favourites", null);
+        cursor.moveToPosition(position);
+
+        ((MainActivity)getActivity()).updateDrawerAndDisplay(
+                cursor.getString(cursor.getColumnIndexOrThrow("id")),
+                cursor.getString(cursor.getColumnIndexOrThrow("name")));
     }
 
     private void removeFavourite(int position) {

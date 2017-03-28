@@ -1,13 +1,36 @@
 package com.example.tyler.finalproject;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static com.android.volley.VolleyLog.TAG;
 
 
 public class NotificationService extends IntentService {
@@ -35,26 +58,93 @@ public class NotificationService extends IntentService {
         if (cursor.getCount() > 0) {
             do {
 
-                int notificationID = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(this)
-                                .setSmallIcon(android.R.drawable.stat_notify_more)
-                                .setContentTitle("My notification")
-                                .setContentText(cursor.getString(cursor.getColumnIndexOrThrow("id")));
+                final int notificationID = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                final String previousRunID = cursor.getString(cursor.getColumnIndexOrThrow("last_notified_runid"));
+                final String gameName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                final String gameID = cursor.getString(cursor.getColumnIndexOrThrow("id"));
+                String jsonURL = "http://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=" + gameID;
 
-                NotificationManager mNotifyMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                try {
+                    JSONObject runData = getJSONSameThread(jsonURL);
 
-                // TODO: finish this, these will also have to be translated as well
-                // add another column to the DB that tracks the last runID notified
-                // this will prevent duplicate runs from being notified
+                    JSONArray run = runData.getJSONArray("data");
 
-                // TODO: set intent for the notification
-                mNotifyMgr.notify(notificationID, mBuilder.build());
+                    //If no runs, get out
+                    if (run.length() <= 0)
+                        continue;
+
+                    //Else get the first run
+                    JSONObject firstRun = run.getJSONObject(0);
+
+
+                    //If its the same run we've notified in the past
+                    if (firstRun.getString("id").equals(previousRunID))
+                        continue;
+
+                    Intent notificationIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(firstRun.getString("weblink")));
+                    PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
+
+                    //Else notify user and update database
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(getApplicationContext())
+                                    .setSmallIcon(android.R.drawable.stat_notify_more)
+                                    .setContentTitle("New Run Verified for " + gameName)
+                                    .setContentText("View run now!").setContentIntent(contentIntent);
+
+                    NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    mNotifyMgr.notify(notificationID, mBuilder.build());
+
+                    db.execSQL("UPDATE favourites SET last_notified_runid = '" + firstRun.getString("id") + "' WHERE id = '" + gameID + "'");
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             } while (cursor.moveToNext());
         }
-
         db.close();
+    }
 
+    public JSONObject getJSONSameThread(String url) {
+        URL _url;
+        JSONObject json = null;
+        HttpURLConnection urlConnection;
+        String output = "";
+
+        try {
+            _url = new URL(url);
+            urlConnection = (HttpURLConnection) _url.openConnection();
+        }
+        catch (MalformedURLException e) {
+            return null;
+        }
+        catch (IOException e) {
+            return null;
+        }
+
+        try {
+            BufferedInputStream is = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder total = new StringBuilder(is.available());
+            String line;
+            while ((line = reader.readLine()) != null) {
+                total.append(line).append('\n');
+            }
+            output = total.toString();
+        }
+        catch (IOException e) {
+            return null;
+        }
+        finally{
+            urlConnection.disconnect();
+        }
+
+        try {
+            json = new JSONObject(output);
+        }
+        catch (JSONException e) {
+        }
+        return json;
     }
 }
+

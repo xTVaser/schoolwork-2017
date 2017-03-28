@@ -21,6 +21,10 @@ public class JSONParser extends AsyncTask<String, Object, JSONObject> {
 
     private Activity activity;
 
+    public JSONParser() {
+
+    }
+
     public JSONParser(Activity activity) {
 
         this.activity = activity;
