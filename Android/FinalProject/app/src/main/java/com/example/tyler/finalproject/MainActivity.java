@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
@@ -30,14 +29,11 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
-
-    // ok6qlo1g will be used for testing
 
     private ArrayList<String> categories = new ArrayList<>();
     private String gameID;
@@ -49,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton searchPageBtn;
     private ImageButton favouritePageBtn;
+
+    private Fragment currentFragment;
 
     private SearchPage searchPageFragment;
     private BrowseRuns browsePageFragment;
@@ -66,6 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SQLiteDatabase db = openOrCreateDatabase("srvFavourites", MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS favourites("+
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                "id TEXT NOT NULL, "+
+                "name TEXT NOT NULL, "+
+                "picurl TEXT NOT NULL," +
+                "last_notified_runid TEXT)");
 
         enableNotifications(getApplication());
 
@@ -108,7 +114,52 @@ public class MainActivity extends AppCompatActivity {
         SearchPage searchPage = new SearchPage();
         transaction.add(R.id.fragmentContainer, searchPage);
         searchPageFragment = searchPage;
+        currentFragment = searchPageFragment;
         transaction.commit();
+    }
+
+    protected void onSaveInstanceState(Bundle state) {
+
+        super.onSaveInstanceState(state);
+
+        //If rotation on search page, its fine thats the homepage everything is fine, leave it alone
+        if (currentFragment == searchPageFragment)
+            state.putBoolean("isSearchPage", true);
+        else
+            state.putBoolean("isSearchPage", false);
+
+
+        // If rotation is on the browse page, then we have to store the information for
+        // required to open the browse page again: the gameID and gameName
+        if (currentFragment == browsePageFragment) {
+
+            state.putString("gameID", gameID);
+            state.putString("gameName", currentGameName);
+        }
+
+        // If we are on the favourites page, then we have to store nothing as well, just load the
+        // favourites fragment, so we store something to keep track of the fragment that
+        // has to be loaded.
+        if (currentFragment == favouritePageFragment)
+            state.putBoolean("isFavourite", true);
+        else
+            state.putBoolean("isFavourite", false);
+
+    }
+
+    private boolean restoring = false;
+    protected void onRestoreInstanceState(Bundle state) {
+
+        super.onRestoreInstanceState(state);
+
+        if (state.getBoolean("isFavourite"))
+            loadFavouritePage(null);
+
+        else if(!state.getBoolean("isSearchPage")) {
+            restoring = true;
+            updateDrawerAndDisplay(state.getString("gameID"), state.getString("gameName"));
+            restoring = false;
+        }
     }
 
     public void enableNotifications(Application context) {
@@ -135,12 +186,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Store - game name, game id, picture url
         SQLiteDatabase db = openOrCreateDatabase("srvFavourites", MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS favourites("+
-                   "_id INTEGER PRIMARY KEY AUTOINCREMENT,"+
-                   "id TEXT NOT NULL, "+
-                   "name TEXT NOT NULL, "+
-                   "picurl TEXT NOT NULL," +
-                   "last_notified_runid TEXT)");
 
         ContentValues insert = new ContentValues();
         insert.put("id", gameID);
@@ -254,8 +299,10 @@ public class MainActivity extends AppCompatActivity {
         db.close();
 
         //Close the soft keyboard
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        if (!restoring) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
 
         favouritePageBtn.setImageResource(R.drawable.star);
         searchPageBtn.setImageResource(R.drawable.search);
@@ -297,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
         browseRuns.passFragments(fragments);
         transaction.replace(R.id.fragmentContainer, browseRuns);
         browsePageFragment = browseRuns;
+        currentFragment = browsePageFragment;
         transaction.commit();
 
     }
@@ -323,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
         SearchPage searchPage = new SearchPage();
         transaction.replace(R.id.fragmentContainer, searchPage);
         searchPageFragment = searchPage;
+        currentFragment = searchPageFragment;
         transaction.commit();
     }
 
@@ -338,6 +387,7 @@ public class MainActivity extends AppCompatActivity {
         FavouriteGames favRuns = new FavouriteGames();
         transaction.replace(R.id.fragmentContainer, favRuns);
         favouritePageFragment = favRuns;
+        currentFragment = favouritePageFragment;
         transaction.commit();
     }
 }
