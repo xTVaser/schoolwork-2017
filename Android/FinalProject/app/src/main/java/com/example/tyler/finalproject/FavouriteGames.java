@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,10 +109,10 @@ public class FavouriteGames extends Fragment {
     private void removeFavouriteDialog(final int position) {
 
         // Display dialog to confirm
-        new AlertDialog.Builder(getActivity())
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Deletion Confirmation")
-                .setMessage("Are you sure you want to delete " + gameNames.get(position) + " from favourites?")
+                .setTitle(Html.fromHtml("<font color='#c6ff00'>Deletion Confirmation</font>"))
+                .setMessage(Html.fromHtml("<font color='#fffde7'>Are you sure you want to delete " + gameNames.get(position) + " from favourites?</font>"))
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -123,8 +124,9 @@ public class FavouriteGames extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
-                })
-                .show();
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override

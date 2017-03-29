@@ -76,7 +76,7 @@ public class NotificationService extends IntentService {
                     //Else notify user and update database
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(getApplicationContext())
-                                    .setSmallIcon(android.R.drawable.stat_notify_more)
+                                    .setSmallIcon(android.R.drawable.ic_menu_myplaces)
                                     .setContentTitle("New Run Verified for " + gameName)
                                     .setContentText("View run now!").setContentIntent(contentIntent);
 
