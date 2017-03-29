@@ -1,5 +1,7 @@
 <resources>
+    <!-- Titles -->
     <string name="app_name">Speedrun Viewer</string>
+    <string name="favourites">Favourite Games</string>
 
     <!-- Drawer Strings -->
     <string name="addToFavourites">Add to Favourites</string>
@@ -17,4 +19,17 @@
     <string name="runner">Runner</string>
     <string name="time">Time</string>
     <string name="date">Date</string>
+
+    <!-- Toast Notifications -->
+    <string name="toastNoGameSelected">No currently selected game to add to favourites!</string>
+    <string name="toastNothingEntered">Error, No Game Entered</string>
+    <string name="toastUntrackedGame">Untracked game, try again</string>
+    <string name="toastNoCategories">Game has no runs associated with it.</string>
+    <string name="toastJSONError">JSON Extraction Error</string>
+    <string name="toastThreadError">Error while threading</string>
+
+    <!-- Accessibility -->
+    <string name="searchButtonAcc">Search page button</string>
+    <string name="favouriteButtonAcc">Favourite game page button</string>
+    <string name="gameImageAcc">Game cover image</string>
 </resources>

@@ -1,12 +1,8 @@
 package com.example.tyler.finalproject;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,9 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * Created by tyler on 26/03/17.
- */
 
 public class GetRuns implements Runnable {
 
@@ -115,7 +108,7 @@ public class GetRuns implements Runnable {
 
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            Log.e("JSONError", e.getMessage());
         }
     }
 

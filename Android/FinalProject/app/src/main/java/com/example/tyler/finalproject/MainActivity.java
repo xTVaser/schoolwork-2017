@@ -11,12 +11,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
-import android.os.HandlerThread;
+import android.graphics.Color;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -31,12 +30,10 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-
-import static android.view.View.GONE;
-import static android.widget.Toast.makeText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -127,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
     public void addGameToFavourites(View view) {
 
         if (gameName.getText().equals(getString(R.string.gameNamePrompt))) {
-            Toast.makeText(this, "No currently selected game to add to favourites!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.toastNoGameSelected), Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (gameID == null || gameName.getText() == null || gamePicURL == null) {
-            Toast.makeText(this, "Vital data missing, error.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.toastNothingEntered), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -159,8 +156,12 @@ public class MainActivity extends AppCompatActivity {
 
         String userInput = searchPageFragment.searchField.getText().toString();
 
-        if (userInput.equals(""))
+        if (userInput.equals("")) {
+            Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.toastNothingEntered), Toast.LENGTH_SHORT);
+            toast.show();
             return;
+        }
+
 
         int currentPosition = searchPageFragment.selectedPosition;
         String actualGame = searchPageFragment.gameList.get(currentPosition);
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONArray fuzzySearch = new JSONParser(this).execute(jsonUrl).get().getJSONArray("data");
 
                 if (fuzzySearch.length() <= 0) { //Still no results
-                    Toast.makeText(this, "Error, untracked game", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.toastUntrackedGame), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -185,8 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 actualGame = fuzzyResults.getJSONObject("names").getString("international");
             }
             catch (InterruptedException | ExecutionException | JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "JSON Error on Fuzzy Search", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.toastJSONError), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             gamePicURL = gameAssets.getJSONObject("cover-small").getString("uri");
         }
         catch (JSONException | ExecutionException | InterruptedException e) {
-            System.out.println(e.getMessage());
+            Toast.makeText(getApplicationContext(), getString(R.string.toastJSONError), Toast.LENGTH_SHORT).show();
         }
 
         //Update the drawer information
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             JSONArray categoryData = json.getJSONArray("data");
 
             if (categoryData.length() < 1) {
-                Toast.makeText(this, "Game has no runs associated with it.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.toastNoCategories), Toast.LENGTH_SHORT).show();
                 return;
             }
             categories = new ArrayList<>();
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         catch (JSONException | ExecutionException | InterruptedException e) {
-            System.out.println(e.getMessage());
+            Toast.makeText(getApplicationContext(), getString(R.string.toastJSONError), Toast.LENGTH_SHORT).show();
         }
 
         navDrawerItems.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, categories));
@@ -257,7 +257,9 @@ public class MainActivity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
-        // TODO: changing this to be a param would allow for the notification intents to go directly to the right category
+        favouritePageBtn.setImageResource(R.drawable.star);
+        searchPageBtn.setImageResource(R.drawable.search);
+
         launchBrowseTab(0);
     }
 
@@ -311,6 +313,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadSearchPage(View view) {
 
+        setTitle(R.string.app_name);
+
         searchPageBtn.setImageResource(R.drawable.search_active);
         favouritePageBtn.setImageResource(R.drawable.star);
 
@@ -323,6 +327,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadFavouritePage(View view) {
+
+        setTitle(R.string.favourites);
 
         searchPageBtn.setImageResource(R.drawable.search);
         favouritePageBtn.setImageResource(R.drawable.star_active);

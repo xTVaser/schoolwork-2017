@@ -1,6 +1,5 @@
 package com.example.tyler.finalproject;
 
-import android.app.Activity;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,15 +7,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,9 +21,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static com.android.volley.VolleyLog.TAG;
-
 
 public class NotificationService extends IntentService {
 
@@ -97,7 +86,7 @@ public class NotificationService extends IntentService {
                     db.execSQL("UPDATE favourites SET last_notified_runid = '" + firstRun.getString("id") + "' WHERE id = '" + gameID + "'");
                 }
                 catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("JSONError", e.getMessage());
                 }
 
             } while (cursor.moveToNext());
@@ -143,6 +132,7 @@ public class NotificationService extends IntentService {
             json = new JSONObject(output);
         }
         catch (JSONException e) {
+            Log.e("JSONError", e.getMessage());
         }
         return json;
     }

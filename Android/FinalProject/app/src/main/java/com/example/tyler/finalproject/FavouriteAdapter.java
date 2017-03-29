@@ -4,19 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
-import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 
@@ -65,7 +62,7 @@ public class FavouriteAdapter extends CursorAdapter {
                 image = BitmapFactory.decodeStream(in);
             }
             catch (Exception e) {
-                System.out.println("Error when retrieving image");
+                Log.e("JSONError", e.getMessage());
             }
             return image;
         }

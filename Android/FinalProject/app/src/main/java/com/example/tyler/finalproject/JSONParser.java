@@ -2,6 +2,7 @@ package com.example.tyler.finalproject;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,14 +34,14 @@ public class JSONParser extends AsyncTask<String, Object, JSONObject> {
     @Override
     protected JSONObject doInBackground(String... params) {
 
-        URL _url;
+        URL url;
         JSONObject json = null;
         HttpURLConnection urlConnection;
         String output = "";
 
         try {
-            _url = new URL(params[0]);
-            urlConnection = (HttpURLConnection) _url.openConnection();
+            url = new URL(params[0]);
+            urlConnection = (HttpURLConnection) url.openConnection();
         }
         catch (MalformedURLException e) {
             return null;
@@ -54,15 +55,18 @@ public class JSONParser extends AsyncTask<String, Object, JSONObject> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder total = new StringBuilder(is.available());
             String line;
+
             while ((line = reader.readLine()) != null) {
                 total.append(line).append('\n');
             }
+
             output = total.toString();
         }
         catch (IOException e) {
             return null;
         }
-        finally{
+        finally {
+
             urlConnection.disconnect();
         }
 
@@ -70,7 +74,9 @@ public class JSONParser extends AsyncTask<String, Object, JSONObject> {
             json = new JSONObject(output);
         }
         catch (JSONException e) {
+            Log.e("JSONError", e.getMessage());
         }
+
         response = json;
         return json;
     }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Speedrun Viewer</string>
+    <string name="favourites">Jeux Favoris</string>
 
     <!-- Drawer Strings -->
     <string name="addToFavourites">Ajouter aux Favoris</string>
@@ -17,4 +18,17 @@
     <string name="runner">Joueur</string>
     <string name="time">Temps</string>
     <string name="date">Date</string>
+
+    <!-- Toast Notifications -->
+    <string name="toastNoGameSelected">Aucun jeu actuellement sélectionné pour les ajouter aux favoris!</string>
+    <string name="toastNothingEntered">Erreur, pas de jeu entré</string>
+    <string name="toastUntrackedGame">Untracked jeu, essayez de nouveau</string>
+    <string name="toastNoCategories">Le jeu n\'a pas de parcours associé.</string>
+    <string name="toastJSONError">Erreur d\'extraction JSON</string>
+    <string name="toastThreadError">Erreur lors du thread</string>
+
+    <!-- Accessibility -->
+    <string name="searchButtonAcc">Bouton de la page de recherche</string>
+    <string name="favouriteButtonAcc">Bouton de la page du jeu préféré</string>
+    <string name="gameImageAcc">Image de couverture de jeu</string>
 </resources>

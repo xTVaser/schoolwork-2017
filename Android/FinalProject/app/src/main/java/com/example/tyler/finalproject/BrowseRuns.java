@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +16,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class BrowseRuns extends Fragment {
@@ -77,7 +73,7 @@ public class BrowseRuns extends Fragment {
             runList.setAdapter(adapter);
         }
         catch (InterruptedException e) {
-            Toast.makeText(getActivity(), "Error with threading", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toastThreadError), Toast.LENGTH_SHORT).show();
         }
 
         final List<Run> finalRuns = runs;
